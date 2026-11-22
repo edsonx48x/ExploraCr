@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>ExploraCR — Descubre Costa Rica</title>
+<!-- Conexión anticipada a Google Fonts para que la fuente cargue más rápido -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<!-- Leaflet (mapa) y su plugin de clusters: solo estilos aquí, los scripts van abajo -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+<!-- Fuentes: Plus Jakarta Sans (texto), Fraunces (títulos) y Caveat (notas a mano) -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,400&family=Caveat:wght@600&display=swap" rel="stylesheet"/>
+<!-- Estilos propios de la página -->
+<link rel="stylesheet" href="css/styles.css"/>
+<!-- Scripts con "defer": se descargan sin frenar la página y se ejecutan en este orden.
+     1) Leaflet 2) clusters 3) datos base 4) guardado 5) lógica principal -->
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script defer src="js/data.js"></script>
+<script defer src="js/store.js"></script>
+<script defer src="js/geo.js"></script>
+<script defer src="js/app.js"></script>
+<script defer src="js/cerca.js"></script>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast" style="display:none"></div>
+
+<!-- ════════════════════ NAVBAR ════════════════════ -->
+<nav class="nb">
+  <div style="max-width:1200px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px">
+    <!-- Logo -->
+    <a href="#" style="display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0">
+      <span style="font-size:24px" class="lf">🌿</span>
+      <span class="fd" style="font-size:20px;font-weight:700;color:var(--verde-900)">ExploraCR</span>
+    </a>
+
+    <!-- Desktop links -->
+    <div id="nav-links" style="display:none;gap:4px" class="sm-flex">
+      <a href="#recomendaciones" class="nav-lnk">Lugares</a>
+      <a href="#cerca" class="nav-lnk">Cerca de ti</a>
+      <a href="#mapa" class="nav-lnk">Mapa</a>
+      <a href="#comunidad" class="nav-lnk">Comunidad</a>
+    </div>
+
+    <!-- Right side -->
+    <div style="display:flex;align-items:center;gap:8px">
+      <!-- Desktop auth -->
+      <div id="nav-auth" style="display:none;gap:8px" class="sm-flex">
+        <button onclick="abrirM('login')" class="btn btn-out btn-sm">Entrar</button>
+        <button onclick="abrirM('registro')" class="btn btn-sm">Registrarse</button>
+      </div>
+      <!-- User menu (desktop) -->
+      <div id="nav-user" style="display:none;position:relative">
+        <button onclick="toggleUD()" style="display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;padding:4px">
+          <div class="av" id="nav-av"><span id="nav-ini">?</span></div>
+          <span style="font-size:13px;font-weight:600;color:var(--tinta-fuerte);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="nav-uname">Usuario</span>
+          <span style="color:var(--tinta-tenue);font-size:11px">▾</span>
+        </button>
+        <div class="udrop" id="udrop" style="display:none">
+          <a href="#" onclick="abrirPerfil();return false">👤 Mi perfil</a>
+          <a href="#" onclick="abrirM('agregar');return false">➕ Agregar lugar</a>
+          <hr style="margin:4px 0;border:none;border-top:1px solid var(--crema-osc)"/>
+          <button onclick="cerrarSesion()">🚪 Cerrar sesión</button>
+        </div>
+      </div>
+      <!-- Hamburger (mobile) -->
+      <button id="btn-ham" onclick="toggleMobMenu()" style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:10px;border:1.5px solid var(--linea);background:var(--papel);cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation" aria-label="Menú">
+        <span id="ham-icon" style="position:relative;width:18px;height:14px;display:block">
+          <span class="ham-bar" style="position:absolute;top:0;left:0;width:18px;height:2px;border-radius:1px;background:var(--tinta);transition:transform .25s ease,opacity .2s ease,top .25s ease"></span>
+          <span class="ham-bar" style="position:absolute;top:6px;left:0;width:18px;height:2px;border-radius:1px;background:var(--tinta);transition:transform .25s ease,opacity .2s ease"></span>
+          <span class="ham-bar" style="position:absolute;top:12px;left:0;width:18px;height:2px;border-radius:1px;background:var(--tinta);transition:transform .25s ease,opacity .2s ease,top .25s ease"></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mmenu" id="mob-menu" style="display:none" onclick="closeMobIfBg(event)">
+  <div class="mmenu-bg"></div>
+  <div class="mmenu-panel pb-safe">
+    <div class="mmenu-head">
+      <span style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px">🌿</span>
+        <span class="fd" style="font-size:17px;font-weight:700;color:var(--verde-900)">Menú</span>
+      </span>
+      <button class="mmenu-close" onclick="closeMobMenu()" aria-label="Cerrar menú">✕</button>
+    </div>
+    <div class="mmenu-body">
+      <!-- Si no logueado -->
+      <div id="mm-auth">
+        <div style="display:flex;flex-direction:column;gap:10px;padding:16px 20px 18px">
+          <button onclick="closeMobMenu();abrirM('login')" class="btn btn-out">Entrar</button>
+          <button onclick="closeMobMenu();abrirM('registro')" class="btn">Registrarse</button>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--linea);margin-bottom:8px"/>
+      </div>
+      <!-- Si logueado -->
+      <div id="mm-user" style="display:none;padding:16px 20px 18px">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--verde-50);border-radius:14px">
+          <div class="av" id="mm-av" style="width:44px;height:44px;font-size:17px"><span id="mm-ini">?</span></div>
+          <div style="min-width:0"><p style="font-weight:700;color:var(--verde-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="mm-name">Usuario</p><p style="font-size:12px;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="mm-email"></p></div>
+        </div>
+      </div>
+      <a href="#recomendaciones" onclick="closeMobMenu()">🗺️ Lugares</a>
+      <a href="#cerca" onclick="closeMobMenu()">🧭 Cerca de ti</a>
+      <a href="#mapa" onclick="closeMobMenu()">📍 Mapa GPS</a>
+      <a href="#comunidad" onclick="closeMobMenu()">💬 Comunidad</a>
+      <button class="mm-btn" id="mm-btn-agregar" onclick="closeMobMenu();usuarioActual?abrirM('agregar'):abrirM('login')">➕ Agregar lugar</button>
+      <div id="mm-logged" style="display:none">
+        <hr style="border:none;border-top:1px solid var(--linea);margin:8px 0"/>
+        <button class="mm-btn" onclick="closeMobMenu();abrirPerfil()">👤 Mi perfil</button>
+        <button class="mm-btn" onclick="closeMobMenu();cerrarSesion()" style="color:var(--terracota-osc)">🚪 Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<section class="hero" style="padding:64px 16px 76px">
+  <!-- Sello decorativo tipo pasaporte (solo en pantallas anchas) -->
+  <div class="sello-hero" aria-hidden="true"><span>Pura<br>Vida<small>★ Costa Rica ★</small></span></div>
+  <div style="max-width:720px;margin:0 auto;text-align:center;position:relative;z-index:2">
+    <p class="au eyebrow eyebrow-hero">🧭 Costa Rica · Pura Vida</p>
+    <h1 class="fd au d1" style="font-size:clamp(30px,8vw,62px);color:var(--papel);line-height:1.1;margin-bottom:16px">
+      Descubre los mejores<br><em style="color:var(--ocre-claro)">rincones del país</em>
+    </h1>
+    <p class="au d2" style="color:var(--crema);font-size:clamp(14px,3.5vw,17px);line-height:1.6;max-width:480px;margin:0 auto 28px">Restaurantes, cafeterías, actividades y zonas turísticas, con GPS y lo que tienes cerca. Comparte tus reseñas y descubre los favoritos de la comunidad.</p>
+    <div class="au d3" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a href="#recomendaciones" class="btn btn-claro" style="font-size:14px;padding:12px 24px">Ver lugares</a>
+      <button onclick="irCerca()" class="btn btn-trans" style="font-size:14px;padding:12px 24px">📍 Cerca de ti</button>
+    </div>
+    <!-- Stats -->
+    <div class="au d4" style="display:flex;gap:24px;justify-content:center;margin-top:44px;flex-wrap:wrap">
+      <div style="text-align:center"><p class="fd" style="font-size:28px;font-weight:700;color:var(--papel)" id="st-p">9</p><p style="font-size:11px;color:var(--verde-300);margin-top:2px">Lugares</p></div>
+      <div style="width:1px;background:rgba(255,251,240,.2)"></div>
+      <div style="text-align:center"><p class="fd" style="font-size:28px;font-weight:700;color:var(--papel)" id="st-r">0</p><p style="font-size:11px;color:var(--verde-300);margin-top:2px">Reseñas</p></div>
+      <div style="width:1px;background:rgba(255,251,240,.2)"></div>
+      <div style="text-align:center"><p class="fd" style="font-size:28px;font-weight:700;color:var(--papel)" id="st-u">0</p><p style="font-size:11px;color:var(--verde-300);margin-top:2px">Usuarios</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ FILTROS ════════════════════ -->
+<section style="max-width:1200px;margin:0 auto;padding:24px 16px 8px">
+  <!-- Buscador: filtra las tarjetas y el mapa mientras se escribe -->
+  <input class="inp" id="q" type="search" oninput="buscar()" placeholder="🔍 Buscar por nombre, zona o descripción..." style="max-width:420px;margin-bottom:12px"/>
+  <!-- Botones de categoría (filtran tarjetas y mapa) -->
+  <div class="fscroll" id="filtros">
+    <button onclick="filtrar('todos')" class="cb active" data-cat="todos">🗺️ Todos</button>
+    <button onclick="filtrar('restaurante')" class="cb" data-cat="restaurante">🍽️ Restaurantes</button>
+    <button onclick="filtrar('cafeteria')" class="cb" data-cat="cafeteria">☕ Cafeterías</button>
+    <button onclick="filtrar('hotel')" class="cb" data-cat="hotel">🏨 Hoteles</button>
+    <button onclick="filtrar('paseo')" class="cb" data-cat="paseo">🥾 Paseos</button>
+    <button onclick="filtrar('actividad')" class="cb" data-cat="actividad">🧗 Actividades</button>
+    <button onclick="filtrar('turistico')" class="cb" data-cat="turistico">📸 Zonas turísticas</button>
+    <!-- Ordena por distancia y limita al radio elegido (pide la ubicación) -->
+    <button onclick="toggleCerca()" class="cb cb-cerca" id="chip-cerca">📍 Cerca de mí</button>
+    <!-- Agregar (solo desktop) -->
+    <button onclick="usuarioActual?abrirM('agregar'):abrirM('login')" class="btn btn-sm" style="margin-left:auto;flex-shrink:0;display:none" id="btn-add-desk">➕ Agregar lugar</button>
+  </div>
+  <!-- Radio de "Cerca de mí": solo se ve con ese filtro activo -->
+  <div class="fila-radio" id="fila-radio">
+    <label for="radio-lugares">Dentro de</label>
+    <select class="inp" id="radio-lugares" onchange="cambiarRadio()" style="width:auto;padding:6px 10px">
+      <option value="5">5 km</option><option value="10">10 km</option><option value="25" selected>25 km</option><option value="50">50 km</option><option value="100">100 km</option>
+    </select>
+  </div>
+</section>
+
+<!-- ════════════════════ CARDS ════════════════════ -->
+<section id="recomendaciones" style="max-width:1200px;margin:0 auto;padding:12px 16px 48px">
+  <!-- Texto "Mostrando X de Y lugares" -->
+  <p id="res-info" style="font-size:12px;color:var(--tinta-suave);margin-bottom:10px"></p>
+  <!-- Bloques grises de carga; JS los oculta al pintar las tarjetas -->
+  <div id="shimmer-g" class="places-grid">
+    <div class="sk"></div><div class="sk"></div><div class="sk"></div>
+  </div>
+  <!-- Aquí JS dibuja las tarjetas de los lugares (de a 9) -->
+  <div id="grid-l" class="places-grid" style="display:none"></div>
+  <div style="text-align:center;margin-top:24px"><button id="btn-more" class="btn-more" onclick="verMas()" style="display:none">Ver más lugares</button></div>
+</section>
+
+<!-- ════════════════════ CERCA DE TI ════════════════════ -->
+<!-- Lugares reales alrededor tuyo (datos de OpenStreetMap). Lo llena js/cerca.js -->
+<section id="cerca" class="sec-cerca">
+  <div style="max-width:1200px;margin:0 auto">
+    <p class="eyebrow">Descubrí a tu alrededor</p>
+    <h2 class="fd" style="font-size:clamp(22px,5vw,30px);font-weight:700;color:var(--verde-900);margin-bottom:6px">Cerca de ti</h2>
+    <p style="color:var(--tinta-suave);font-size:13px;margin-bottom:16px;max-width:560px">Restaurantes, cafeterías, actividades y zonas turísticas que están ahora mismo a tu alrededor, ordenados por distancia.</p>
+    <div class="fscroll" id="cerca-cats" style="margin-bottom:12px">
+      <button onclick="selCatCerca('restaurante')" class="cb active" data-cc="restaurante">🍽️ Restaurantes</button>
+      <button onclick="selCatCerca('cafeteria')" class="cb" data-cc="cafeteria">☕ Cafeterías</button>
+      <button onclick="selCatCerca('actividad')" class="cb" data-cc="actividad">🧗 Actividades</button>
+      <button onclick="selCatCerca('turistico')" class="cb" data-cc="turistico">📸 Zonas turísticas</button>
+      <button onclick="selCatCerca('paseo')" class="cb" data-cc="paseo">🥾 Paseos</button>
+      <button onclick="selCatCerca('hotel')" class="cb" data-cc="hotel">🏨 Hoteles</button>
+    </div>
+    <div class="fila-cerca">
+      <label for="cerca-radio" style="font-size:13px">Radio</label>
+      <select class="inp" id="cerca-radio" onchange="if(ubi)buscarCerca()" style="width:auto;padding:8px 12px">
+        <option value="500">500 m</option><option value="1000">1 km</option><option value="2000" selected>2 km</option><option value="5000">5 km</option><option value="10000">10 km</option>
+      </select>
+      <button onclick="buscarCerca(true)" class="btn btn-sm">🔎 Buscar cerca de mí</button>
+      <button onclick="verCercaEnMapa()" class="btn btn-out btn-sm" id="cerca-mapa-btn" style="display:none">🗺️ Ver en el mapa</button>
+    </div>
+    <p id="cerca-info" style="font-size:13px;color:var(--tinta-suave);margin:14px 0 10px">Tocá «Buscar cerca de mí» y te mostramos lo que hay a tu alrededor.</p>
+    <div id="cerca-grid" class="cerca-grid"></div>
+    <p style="font-size:11px;color:var(--tinta-tenue);margin-top:14px;line-height:1.5">🔒 Tu ubicación no se guarda: para buscar se envía, redondeada a ~100 m, a OpenStreetMap. Datos © colaboradores de <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" style="text-decoration:underline">OpenStreetMap</a>. El GPS solo funciona en páginas https o en localhost.</p>
+  </div>
+</section>
+
+<!-- ════════════════════ COMUNIDAD ════════════════════ -->
+<section id="comunidad" class="sec-papel">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="reveal" style="text-align:center;margin-bottom:32px">
+      <p class="eyebrow">Comunidad</p>
+      <h2 class="fd" style="font-size:clamp(24px,5vw,34px);font-weight:700;color:var(--verde-900)">Lo que dice la gente</h2>
+      <p style="color:var(--tinta-suave);margin-top:6px;font-size:14px">Reseñas reales de viajeros y locales</p>
+      <div class="orn" aria-hidden="true">✦</div>
+    </div>
+    <!-- Aquí JS dibuja las últimas reseñas; si no hay, se muestra el mensaje de abajo -->
+    <div id="rv-grid" class="reviews-grid"></div>
+    <div id="rv-empty" style="text-align:center;padding:40px 16px;color:var(--tinta-tenue);display:none">
+      <p style="font-size:36px;margin-bottom:10px">💬</p>
+      <p style="font-weight:600;margin-bottom:4px">Aún no hay reseñas</p>
+      <p style="font-size:13px">Sé el primero en compartir tu experiencia.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ MAPA ════════════════════ -->
+<section id="mapa" style="max-width:1200px;margin:0 auto;padding:48px 16px 56px">
+  <div class="reveal" style="margin-bottom:16px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div>
+      <p class="eyebrow">GPS interactivo</p>
+      <h2 class="fd" style="font-size:clamp(22px,5vw,30px);font-weight:700;color:var(--verde-900)">Mapa de lugares</h2>
+      <p style="color:var(--tinta-suave);font-size:13px;margin-top:4px">Toca un marcador para ver detalles · <button onclick="obtenerUbi()" class="lnk" style="font-size:13px;text-decoration:underline">Centrar aquí</button></p>
+    </div>
+    <span id="gps-badge" style="display:none;background:var(--verde-100);color:var(--verde-800);border:1px solid var(--verde-200);font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;align-items:center;gap:6px">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--verde-500);animation:pulse2 2s infinite"></span>GPS activo
+    </span>
+  </div>
+  <!-- Aviso que aparece cuando se está eligiendo un punto en el mapa -->
+  <div id="pick-banner" style="display:none;align-items:center;justify-content:space-between;gap:10px;background:var(--verde-900);color:var(--papel);padding:10px 16px;border-radius:12px;margin-bottom:10px;font-size:13px;font-weight:600"><span>📍 Tocá el mapa para marcar el lugar</span><button onclick="cancelarPick()" style="background:rgba(255,251,240,.18);color:var(--papel);border:none;padding:6px 14px;border-radius:999px;cursor:pointer;font-family:inherit;font-weight:600;font-size:12px">Cancelar</button></div>
+  <!-- Contenedor del mapa: Leaflet lo llena solo cuando la sección se acerca a la pantalla -->
+  <div id="map" class="reveal"></div>
+</section>
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer class="pie">
+  <p class="ruta" aria-hidden="true">· · · · · ✦ · · · · ·</p>
+  <p class="fd" style="font-size:20px;color:var(--crema);margin-bottom:6px;font-style:italic">Pura Vida 🌿</p>
+  <p style="font-size:12px">ExploraCR · Hecho con ❤️ para descubrir Costa Rica</p>
+</footer>
+
+<!-- FAB móvil -->
+<button class="fab" onclick="usuarioActual?abrirM('agregar'):abrirM('login')" title="Agregar lugar">➕</button>
+
+<!-- ══════════════ MODALES ══════════════ -->
+
+<!-- LOGIN -->
+<div class="mb" id="m-login" style="display:none" onclick="cmbg(event,'login')">
+  <div class="mx asi" style="padding:28px 20px 32px">
+    <div class="grab" style="margin:0 auto 24px"></div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:32px;margin-bottom:8px" class="lf">🌿</div>
+      <h2 class="fd" style="font-size:22px;font-weight:700;color:var(--verde-900)">Bienvenido de vuelta</h2>
+      <p style="color:var(--tinta-suave);font-size:13px;margin-top:4px">Inicia sesión para compartir tus aventuras</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div><label class="lbl">Correo</label><input class="inp" id="li-em" type="email" inputmode="email" autocomplete="email" placeholder="tucorreo@ejemplo.com"/></div>
+      <div><label class="lbl">Contraseña</label><input class="inp" id="li-pw" type="password" autocomplete="current-password" placeholder="••••••••"/></div>
+      <p id="li-err" style="color:var(--terracota-osc);font-size:13px;display:none"></p>
+      <button onclick="doLogin()" id="btn-li" class="btn">Entrar</button>
+      <p style="text-align:center;font-size:13px;color:var(--tinta-suave)">¿No tenés cuenta? <button onclick="abrirM('registro')" class="lnk">Registrarse</button></p>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTRO -->
+<div class="mb" id="m-registro" style="display:none" onclick="cmbg(event,'registro')">
+  <div class="mx asi" style="padding:28px 20px 32px">
+    <div class="grab" style="margin:0 auto 24px"></div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:32px;margin-bottom:8px">🗺️</div>
+      <h2 class="fd" style="font-size:22px;font-weight:700;color:var(--verde-900)">Crear cuenta</h2>
+      <p style="color:var(--tinta-suave);font-size:13px;margin-top:4px">Únete a la comunidad de exploradores</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="pg2">
+        <div><label class="lbl">Nombre</label><input class="inp" id="rg-nom" type="text" autocomplete="given-name" placeholder="Ana"/></div>
+        <div><label class="lbl">Apellido</label><input class="inp" id="rg-ap" type="text" autocomplete="family-name" placeholder="García"/></div>
+      </div>
+      <div><label class="lbl">Correo</label><input class="inp" id="rg-em" type="email" inputmode="email" autocomplete="email" placeholder="tucorreo@ejemplo.com"/></div>
+      <div><label class="lbl">Contraseña</label><input class="inp" id="rg-pw" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres"/></div>
+      <p id="rg-err" style="color:var(--terracota-osc);font-size:13px;display:none"></p>
+      <button onclick="doRegistro()" id="btn-rg" class="btn">Crear cuenta</button>
+      <p style="text-align:center;font-size:13px;color:var(--tinta-suave)">¿Ya tenés cuenta? <button onclick="abrirM('login')" class="lnk">Entrar</button></p>
+    </div>
+  </div>
+</div>
+
+<!-- AGREGAR LUGAR -->
+<div class="mb" id="m-agregar" style="display:none" onclick="cmbg(event,'agregar')">
+  <div class="mx asi" style="padding:24px 20px 32px">
+    <div class="grab" style="margin:0 auto 20px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h2 class="fd" style="font-size:20px;font-weight:700;color:var(--verde-900)">Agregar lugar</h2>
+      <button onclick="cerrarM('agregar')" class="xbtn">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div><label class="lbl">Nombre del lugar *</label><input class="inp" id="ad-nom" type="text" maxlength="80" placeholder="Ej: Restaurante La Selva"/></div>
+      <div><label class="lbl">Categoría *</label>
+        <select class="inp" id="ad-cat"><option value="">Seleccionar...</option><option value="restaurante">🍽️ Restaurante</option><option value="cafeteria">☕ Cafetería</option><option value="hotel">🏨 Hotel</option><option value="paseo">🥾 Paseo</option><option value="actividad">🧗 Actividad</option><option value="turistico">📸 Zona turística</option></select>
+      </div>
+      <div><label class="lbl">Zona / Ubicación *</label><input class="inp" id="ad-zona" type="text" maxlength="80" placeholder="Ej: Barrio Escalante, San José"/></div>
+      <div class="pg2">
+        <div><label class="lbl">Latitud</label><input class="inp" id="ad-lat" type="number" inputmode="decimal" step="any" placeholder="9.9281"/></div>
+        <div><label class="lbl">Longitud</label><input class="inp" id="ad-lng" type="number" inputmode="decimal" step="any" placeholder="-84.0907"/></div>
+      </div>
+      <!-- Atajos para llenar latitud/longitud sin escribirlas a mano -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn-mini" onclick="coordsGPS()">📍 Usar mi ubicación</button><button type="button" class="btn-mini" onclick="elegirEnMapa()">🗺️ Elegir en el mapa</button></div>
+      <div><label class="lbl">Descripción *</label><textarea class="inp" id="ad-desc" rows="3" maxlength="300" placeholder="¿Qué hace especial este lugar?"></textarea></div>
+      <div><label class="lbl">Precio</label><input class="inp" id="ad-precio" type="text" placeholder="Ej: ₡₡₡ o $15"/></div>
+      <div><label class="lbl" style="margin-bottom:8px">Tu calificación *</label>
+        <div id="sa-w" style="display:flex;gap:6px"><span class="sb" data-v="1" onclick="setSA(1)">★</span><span class="sb" data-v="2" onclick="setSA(2)">★</span><span class="sb" data-v="3" onclick="setSA(3)">★</span><span class="sb" data-v="4" onclick="setSA(4)">★</span><span class="sb" data-v="5" onclick="setSA(5)">★</span></div>
+      </div>
+      <p id="ad-err" style="color:var(--terracota-osc);font-size:13px;display:none"></p>
+      <div style="display:flex;gap:10px">
+        <button onclick="cerrarM('agregar')" class="btn btn-out" style="flex:1">Cancelar</button>
+        <button onclick="guardarLugar()" class="btn" style="flex:2">Publicar lugar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETALLE / REVIEWS -->
+<div class="mb" id="m-detalle" style="display:none" onclick="cmbg(event,'detalle')">
+  <div class="mx asi" style="padding:0;overflow:hidden">
+    <div style="padding:6px 0 0;text-align:center"><div class="grab" style="display:inline-block"></div></div>
+    <div id="det-hdr" style="padding:20px 20px 16px;border-bottom:1px solid var(--crema-osc)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div>
+          <span id="det-tag" class="tag" style="margin-bottom:8px;display:inline-block"></span>
+          <h2 class="fd" id="det-nom" style="font-size:20px;font-weight:700;color:var(--verde-900);line-height:1.2"></h2>
+          <p id="det-zona" style="color:var(--tinta-suave);font-size:12px;margin-top:4px"></p>
+        </div>
+        <button onclick="cerrarM('detalle')" class="xbtn">✕</button>
+      </div>
+      <p id="det-desc" style="font-size:13px;color:var(--tinta);line-height:1.5;margin-top:10px"></p>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <span id="det-precio" style="font-size:13px;font-weight:600;color:var(--verde-900);background:var(--verde-100);padding:5px 14px;border-radius:999px;border:1px solid var(--verde-200)"></span>
+        <a id="det-maps" href="#" target="_blank" class="btn btn-sm" style="padding:6px 16px">🗺️ Cómo llegar</a>
+      </div>
+    </div>
+    <div style="padding:14px 20px 0;background:var(--crema-claro);border-bottom:1px solid var(--linea)">
+      <div style="display:flex;gap:4px;background:var(--crema-osc);border-radius:999px;padding:4px;width:fit-content">
+        <button class="tab active" id="tab-rv" onclick="swTab('rv')">Reseñas</button>
+        <button class="tab" id="tab-wr" onclick="swTab('wr')">Escribir reseña</button>
+      </div>
+    </div>
+    <div id="tc-rv" style="padding:16px 20px;max-height:300px;overflow-y:auto"><div id="rv-list"></div></div>
+    <!-- Pestaña "Escribir reseña": el formulario lo genera JS (FORM_RV en app.js) -->
+    <div id="tc-wr" style="display:none;padding:16px 20px 24px"></div>
+  </div>
+</div>
+
+<!-- PERFIL -->
+<div class="mb" id="m-perfil" style="display:none" onclick="cmbg(event,'perfil')">
+  <div class="mx asi" style="padding:24px 20px 32px">
+    <div class="grab" style="margin:0 auto 20px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h2 class="fd" style="font-size:20px;font-weight:700;color:var(--verde-900)">Mi perfil</h2>
+      <button onclick="cerrarM('perfil')" class="xbtn">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:18px;background:var(--verde-50);border-radius:14px">
+      <div class="av-lg" id="pf-av" onclick="document.getElementById('av-inp').click()">
+        <span id="pf-ini">?</span>
+        <div class="eo">📷</div>
+      </div>
+      <input type="file" id="av-inp" accept="image/*" style="display:none" onchange="cambiarAv(event)"/>
+      <div style="min-width:0">
+        <p style="font-weight:700;font-size:16px;color:var(--verde-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pf-nom">Usuario</p>
+        <p style="font-size:12px;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pf-em"></p>
+        <p style="font-size:12px;color:var(--verde-500);margin-top:4px" id="pf-stats"></p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="pg2">
+        <div><label class="lbl">Nombre</label><input class="inp" id="pf-ni" type="text" autocomplete="given-name"/></div>
+        <div><label class="lbl">Apellido</label><input class="inp" id="pf-ai" type="text" autocomplete="family-name"/></div>
+      </div>
+      <div><label class="lbl">Bio</label><textarea class="inp" id="pf-bio" rows="2" placeholder="Contá algo sobre vos..."></textarea></div>
+      <button onclick="guardarPerfil()" class="btn">Guardar cambios</button>
+    </div>
+    <div style="margin-top:20px;border-top:1px solid var(--crema-osc);padding-top:16px">
+      <p style="font-size:13px;font-weight:700;color:var(--tinta);margin-bottom:12px">Mis reseñas</p>
+      <div id="mis-rv" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

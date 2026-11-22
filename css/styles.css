@@ -1,0 +1,343 @@
+/* ════════════════════════════════════════════
+   ESTILOS DE EXPLORACR — estilo "cuaderno de viaje"
+   Paleta: verde musgo + crema de papel, con toques suaves de ocre y terracota.
+   TODOS los colores viven en las variables de :root (abajo). Para cambiar el
+   look de toda la página basta con editar ese bloque.
+   Fuentes: Plus Jakarta Sans (texto), Fraunces (títulos), Caveat (notas a mano)
+   ════════════════════════════════════════════ */
+
+:root{
+  /* Papel y líneas */
+  --crema:#f3ead6;        /* fondo de la página */
+  --crema-claro:#f8f1e1;  /* franjas y superficies suaves */
+  --crema-osc:#e9ddc0;    /* botones de cerrar, fondos de pestañas */
+  --papel:#fffbf0;        /* tarjetas, ventanas, campos y texto sobre verde */
+  --linea:#e2d6b8;        /* bordes suaves */
+  --linea-fuerte:#cdbf9c; /* bordes marcados y líneas punteadas */
+
+  /* Texto (marrón cálido en vez de negro puro) */
+  --tinta-fuerte:#2e2c22;
+  --tinta:#4a4636;
+  --tinta-suave:#675f4a;
+  --tinta-tenue:#8d8668;
+
+  /* Verdes musgo, de oscuro a claro */
+  --verde-900:#263b2c;    /* títulos, portada, pie de página */
+  --verde-800:#34523a;
+  --verde-700:#4a7449;    /* color principal de botones */
+  --verde-500:#6f9468;
+  --verde-400:#8fb084;
+  --verde-300:#b3c8a4;
+  --verde-200:#cfdcbf;
+  --verde-100:#e3ead2;
+  --verde-50:#eef2dd;
+
+  /* Acentos */
+  --ocre:#c19a41;         /* estrellas y paseos */
+  --ocre-claro:#e6c984;
+  --ocre-osc:#8a6a22;
+  --ocre-50:#f6ecce;
+  --terracota:#a9553d;    /* restaurantes y avisos */
+  --terracota-osc:#8a3f2b;
+  --terracota-50:#f5e4da;
+  --terracota-200:#e5c3b2;
+  --azul-ubi:#3d6f78;     /* marcador de "estás aquí" */
+  --cafe:#8b5e3c;         /* cafeterías */
+  --cafe-50:#f1e5d8;
+  --cafe-200:#dbc2a8;
+  --cafe-osc:#6b4528;
+  --azul:#4b7f8f;         /* actividades */
+  --azul-50:#e2eef0;
+  --azul-200:#b9d3d8;
+  --azul-osc:#2f5a66;
+  --ciruela:#85566e;      /* zonas turísticas */
+  --ciruela-50:#f1e3ea;
+  --ciruela-200:#dcbccb;
+  --ciruela-osc:#633d51;
+
+  /* Imágenes decorativas incrustadas (no se descargan aparte) */
+  /* Líneas de nivel de un mapa topográfico, para la portada */
+  --topo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='340' fill='none' stroke='%23f3ead6' stroke-width='1' stroke-opacity='.11'%3E%3Cpath d='M0 30Q100 0 200 30T400 30'/%3E%3Cpath d='M0 70Q100 110 200 70T400 70'/%3E%3Cpath d='M0 110Q100 80 200 110T400 110'/%3E%3Cpath d='M0 150Q100 190 200 150T400 150'/%3E%3Cpath d='M0 190Q100 160 200 190T400 190'/%3E%3Cpath d='M0 230Q100 270 200 230T400 230'/%3E%3Cpath d='M0 270Q100 240 200 270T400 270'/%3E%3Cpath d='M0 310Q100 350 200 310T400 310'/%3E%3C/svg%3E");
+  /* Borde de papel rasgado (se repite hacia los lados) */
+  --rasgado:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='30' viewBox='0 0 600 30'%3E%3Cpath fill='%23f3ead6' d='M0 30V15l22 5 30-9 26 8 34-10 28 9 30-7 40 10 26-8 36 9 32-11 28 8 34-9 30 10 32-8 40 9 28-7 32 8 72-7V30z'/%3E%3C/svg%3E");
+  /* Grano muy suave que imita la textura del papel */
+  --grano:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .34 0 0 0 0 .2 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+/* BASE: reset general (lo que antes hacía Tailwind). Quita márgenes, unifica
+   fuentes y hace que los botones y enlaces no traigan estilos del navegador */
+*,::before,::after{border:0 solid var(--linea)}
+html{line-height:1.5;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+h1,h2,h3{font-size:inherit;font-weight:inherit}
+a{color:inherit;text-decoration:inherit}
+img{display:block;max-width:100%;height:auto}
+button,input,select,textarea{font-family:inherit}
+button{background-color:transparent;background-image:none;cursor:pointer}
+body{font-family:'Plus Jakarta Sans',sans-serif;background-color:var(--crema);background-image:var(--grano);color:var(--tinta-fuerte);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+::selection{background:var(--verde-200)}
+/* .fd = fuente de títulos (Fraunces) */
+.fd{font-family:'Fraunces',serif}
+
+/* ANIMACIONES: se activan con las clases de abajo (.au, .asi, .reveal) o
+   directamente desde otros estilos (toast, loader, hoja del logo) */
+@keyframes fadeUp  {from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn {from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer {from{background-position:-600px 0}to{background-position:600px 0}}
+@keyframes toastIn {from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(16px) scale(.95)}}
+@keyframes spin    {to{transform:rotate(360deg)}}
+@keyframes leafSw  {0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.07)}}
+@keyframes pulse2  {0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes mobMenuIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+/* .au/.asi: aparecen al cargar (subiendo / creciendo). .d1-.d4 les dan retraso escalonado */
+.au  {animation:fadeUp .55s cubic-bezier(.22,1,.36,1) both}
+.asi {animation:scaleIn .32s cubic-bezier(.22,1,.36,1) both}
+.d1{animation-delay:.07s}.d2{animation-delay:.14s}.d3{animation-delay:.21s}.d4{animation-delay:.28s}
+
+/* .reveal: empieza invisible y aparece al hacer scroll (JS le agrega .vis) */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+.reveal.vis{opacity:1;transform:none}
+
+/* ─── PIEZAS REUTILIZABLES ─── */
+
+/* BOTONES: .btn es el principal (verde musgo con "reborde" abajo, como un botón
+   de cuero). Variantes: .btn-out (contorno), .btn-sm (chico), .btn-claro y
+   .btn-trans (para usar sobre la portada verde) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-weight:700;font-size:15px;padding:13px 18px;border-radius:10px;border:none;background:var(--verde-700);color:var(--papel);cursor:pointer;text-decoration:none;box-shadow:0 2px 0 var(--verde-900);transition:transform .12s,box-shadow .12s,background .15s}
+.btn:hover{background:var(--verde-800)}
+.btn:active{transform:translateY(2px);box-shadow:0 0 0 var(--verde-900)}
+.btn-out{background:var(--papel);color:var(--verde-900);border:1.5px solid var(--verde-700);box-shadow:none}
+.btn-out:hover{background:var(--verde-50)}
+.btn-out:active{transform:none}
+.btn-sm{font-size:13px;padding:8px 16px;border-radius:999px}
+.btn-claro{background:var(--papel);color:var(--verde-900);box-shadow:0 2px 0 rgba(0,0,0,.28)}
+.btn-claro:hover{background:var(--crema)}
+.btn-trans{background:rgba(255,251,240,.12);color:var(--papel);border:1.5px solid rgba(255,251,240,.45);box-shadow:none;font-weight:600}
+.btn-trans:hover{background:rgba(255,251,240,.2)}
+.btn-trans:active{transform:none}
+
+/* Enlace tipo botón de texto, y botón redondo de cerrar (✕) */
+.lnk{color:var(--verde-700);background:none;border:none;cursor:pointer;font-weight:600;font-family:inherit}
+.lnk:hover{text-decoration:underline}
+.xbtn{width:32px;height:32px;border-radius:50%;border:none;background:var(--crema-osc);color:var(--tinta);cursor:pointer;font-size:15px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.xbtn:hover{background:var(--linea-fuerte)}
+
+/* Etiqueta de los campos de formulario y barrita para arrastrar los modales */
+.lbl{font-size:13px;font-weight:600;color:var(--tinta);display:block;margin-bottom:6px}
+.grab{width:40px;height:4px;background:var(--linea-fuerte);border-radius:2px}
+
+/* Texto "escrito a mano" que acompaña a los títulos, y adorno ✦ con rayitas */
+.eyebrow{font-family:'Caveat',cursive;font-weight:600;font-size:23px;line-height:1;color:var(--verde-700);margin-bottom:6px}
+.eyebrow-hero{color:var(--verde-300);font-size:25px;margin-bottom:12px}
+.orn{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--verde-500);font-size:13px;margin-top:10px}
+.orn::before,.orn::after{content:'';height:1px;width:52px;background:currentColor;opacity:.55}
+
+/* ─── NAVBAR ─── */
+/* barra fija arriba, color papel semitransparente y una línea punteada abajo */
+.nb{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:rgba(243,234,214,.94);border-bottom:2px dotted var(--linea-fuerte)}
+/* links del navbar: Lugares, Mapa y Comunidad en escritorio */
+.nav-lnk{font-size:13px;font-weight:600;color:var(--tinta);padding:8px 12px;border-radius:999px;transition:background .15s}
+.nav-lnk:hover{background:var(--verde-100);color:var(--verde-900)}
+.lf{animation:leafSw 6s ease-in-out infinite}
+
+/* ─── PORTADA ─── */
+/* verde musgo con líneas de nivel de mapa topográfico y borde de papel rasgado */
+.hero{position:relative;overflow:hidden;background-color:var(--verde-800);background-image:var(--topo),linear-gradient(180deg,#3a5c40 0%,#2c4632 100%)}
+.hero::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:30px;background:var(--rasgado) repeat-x bottom/600px 30px}
+/* sello redondo tipo pasaporte; solo se ve en pantallas anchas */
+.sello-hero{position:absolute;right:8%;top:46px;width:108px;height:108px;border-radius:50%;border:2px dashed rgba(255,251,240,.55);display:none;align-items:center;justify-content:center;text-align:center;color:var(--crema);transform:rotate(12deg);z-index:1;font-family:'Fraunces',serif;font-style:italic;font-size:19px;line-height:1.05}
+.sello-hero::before{content:'';position:absolute;inset:6px;border:1px solid rgba(255,251,240,.35);border-radius:50%}
+.sello-hero small{display:block;font-family:'Plus Jakarta Sans',sans-serif;font-style:normal;font-size:8px;letter-spacing:.14em;text-transform:uppercase;margin-top:5px;opacity:.85}
+@media(min-width:900px){.sello-hero{display:flex}}
+
+/* ─── TARJETAS DE LUGARES ─── */
+/* Cada tarjeta parece un boleto: la parte de arriba (.pc-head) y la de abajo
+   (.pc-body) se separan con una línea punteada y dos muescas en los costados */
+.pc{position:relative;background:var(--papel);border:1px solid var(--linea);border-radius:10px;overflow:hidden;cursor:pointer;-webkit-user-select:none;user-select:none;box-shadow:0 1px 0 var(--linea),0 10px 18px -12px rgba(58,44,20,.45);transition:transform .2s ease,box-shadow .2s ease,opacity .6s ease}
+.pc:hover{transform:translateY(-3px) rotate(-.4deg);box-shadow:0 1px 0 var(--linea),0 16px 26px -12px rgba(58,44,20,.5)}
+.pc:active{transform:scale(.98)}
+.pc-head{padding:16px 16px 14px;border-bottom:2px dashed var(--linea-fuerte)}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.pc-nom{font-family:'Fraunces',serif;font-weight:700;font-size:17px;line-height:1.25;color:var(--verde-900)}
+.pc-est{color:var(--ocre);font-size:12px;margin-top:5px;letter-spacing:.06em}
+.pc-est span{color:var(--tinta-tenue);letter-spacing:0}
+.pc-body{position:relative;padding:14px 16px}
+.pc-body::before,.pc-body::after{content:'';position:absolute;top:-10px;width:18px;height:18px;border-radius:50%;background:var(--crema);border:1px solid var(--linea)}
+.pc-body::before{left:-10px}
+.pc-body::after{right:-10px}
+.pc-desc{color:var(--tinta-suave);font-size:13px;line-height:1.55;margin-bottom:12px}
+.pc-pie{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pc-zona{font-size:11px;color:var(--tinta-tenue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-precio{font-size:12px;font-weight:700;color:var(--verde-900);margin-top:2px}
+/* sello circular con el emoji de la categoría */
+.sello{width:46px;height:46px;border-radius:50%;border:2px dashed var(--verde-500);display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--papel);transform:rotate(-8deg);flex-shrink:0}
+
+/* SHIMMER: bloque beige animado que se ve mientras cargan las tarjetas */
+.sk{background:linear-gradient(90deg,var(--crema-osc) 25%,var(--linea) 50%,var(--crema-osc) 75%);background-size:600px 100%;animation:shimmer 1.4s infinite;border-radius:10px;height:220px}
+
+/* ETIQUETAS de categoría: borde punteado como un sello (rojo restaurante,
+   verde hotel, ocre paseo) */
+.tag{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:5px;border-width:1.5px;border-style:dashed;text-align:right;line-height:1.35}
+.br{background:var(--terracota-50);color:var(--terracota-osc);border-color:var(--terracota-200)}
+.bj{background:var(--verde-100);color:var(--verde-800);border-color:var(--verde-300)}
+.bs{background:var(--ocre-50);color:var(--ocre-osc);border-color:var(--ocre-claro)}
+.bc{background:var(--cafe-50);color:var(--cafe-osc);border-color:var(--cafe-200)}
+.ba{background:var(--azul-50);color:var(--azul-osc);border-color:var(--azul-200)}
+.bt{background:var(--ciruela-50);color:var(--ciruela-osc);border-color:var(--ciruela-200)}
+
+/* ─── MODALES ─── */
+/* .mb es el fondo oscuro y .mx la ventana. En celular sale desde abajo,
+   en pantallas grandes queda centrada. Lleva una franja verde arriba */
+.mb{position:fixed;inset:0;background:rgba(38,59,44,.52);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding:0}
+@media(min-width:640px){.mb{align-items:center;padding:1rem}}
+.mx{background:var(--papel);width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(58,44,20,.25);border-radius:16px 16px 0 0;border-top:4px solid var(--verde-700)}
+@media(min-width:640px){.mx{border-radius:12px;max-height:90vh;border:1px solid var(--linea-fuerte);border-top:4px solid var(--verde-700)}}
+
+/* TOAST: mensaje temporal (abajo en celular, esquina inferior derecha en escritorio) */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;background:var(--verde-900);color:var(--papel);padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 6px 24px rgba(58,44,20,.3);white-space:nowrap;animation:toastIn .3s cubic-bezier(.22,1,.36,1) both;max-width:calc(100vw - 32px);text-align:center}
+@media(min-width:640px){.toast{bottom:28px;left:auto;right:28px;transform:none}}
+.toast.out{animation:toastOut .25s ease both}
+
+/* ─── MAPA ─── */
+/* El mapa va enmarcado como una foto instantánea y con tonos sepia suaves en
+   los mosaicos, para que combine con el papel. Los marcadores no se tiñen */
+.leaflet-container{z-index:1;font-family:inherit;background:var(--crema-osc)}
+.leaflet-tile-pane{filter:sepia(.3) saturate(.85) contrast(.96) brightness(1.03)}
+#map{height:300px;overflow:hidden;border-radius:6px;border:8px solid var(--papel);box-shadow:0 0 0 1px var(--linea-fuerte),0 14px 26px -14px rgba(58,44,20,.55)}
+@media(min-width:640px){#map{height:420px}}
+@media(min-width:1024px){#map{height:480px}}
+.map-popup .leaflet-popup-content-wrapper{border-radius:10px;box-shadow:0 8px 24px rgba(58,44,20,.22);border:1px solid var(--linea);background:var(--papel);font-family:'Plus Jakarta Sans',sans-serif}
+.map-popup .leaflet-popup-tip{background:var(--papel)}
+/* círculos con número que agrupan marcadores cercanos, en verde musgo */
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(111,148,104,.38)}
+.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:var(--verde-700);color:var(--papel);font-weight:700;font-family:inherit}
+
+/* ─── FORMULARIOS ─── */
+/* estilo común de campos de texto, listas y áreas de texto (.inp) */
+.inp{width:100%;border:1.5px solid var(--linea-fuerte);border-radius:8px;padding:11px 14px;font-size:16px;font-family:inherit;color:var(--tinta-fuerte);outline:none;transition:border-color .2s,box-shadow .2s;background:var(--papel);-webkit-appearance:none}
+.inp:focus{border-color:var(--verde-700);box-shadow:0 0 0 3px rgba(74,116,73,.18)}
+.inp::placeholder{color:var(--tinta-tenue)}
+textarea.inp{resize:vertical;min-height:80px}
+
+/* estrellas de calificación; se pintan de ocre con la clase .on */
+.sb{cursor:pointer;font-size:28px;transition:transform .12s;color:var(--linea-fuerte);line-height:1}
+.sb:hover,.sb.on{color:var(--ocre);transform:scale(1.18)}
+@media(min-width:640px){.sb{font-size:24px}}
+
+/* pestañas 'Reseñas' / 'Escribir reseña' del detalle */
+.tab{padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--tinta-suave);border:none;background:none}
+.tab.active{background:var(--papel);color:var(--verde-900);box-shadow:0 2px 6px rgba(58,44,20,.14)}
+
+/* ─── AVATARES ─── */
+/* círculo con iniciales o foto. .av es el chico y .av-lg el del perfil */
+.av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--verde-500),var(--verde-800));color:var(--papel);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.av-lg{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--verde-500),var(--verde-800));color:var(--papel);font-weight:700;font-size:26px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;overflow:hidden;flex-shrink:0}
+.av-lg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.av-lg .eo{position:absolute;inset:0;background:rgba(58,44,20,.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:20px}
+.av-lg:hover .eo,.av-lg:active .eo{opacity:1}
+
+/* ─── MENÚS ─── */
+/* menú desplegable del usuario en el navbar */
+.udrop{position:absolute;right:0;top:calc(100% + 8px);background:var(--papel);border:1px solid var(--linea-fuerte);border-radius:10px;box-shadow:0 12px 32px rgba(58,44,20,.2);min-width:180px;overflow:hidden;z-index:150;animation:mobMenuIn .2s ease both}
+.udrop a,.udrop button{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:14px;color:var(--tinta);text-decoration:none;background:none;border:none;width:100%;cursor:pointer;font-family:inherit;transition:background .15s}
+.udrop a:hover,.udrop button:hover,.udrop a:active,.udrop button:active{background:var(--crema-claro)}
+
+/* menú lateral del celular; se desliza desde la derecha al abrir (.open) */
+.mmenu{position:fixed;inset:0;z-index:400;display:flex;justify-content:flex-end;align-items:stretch;opacity:0;transition:opacity .25s ease}
+.mmenu.open{opacity:1}
+.mmenu-bg{position:absolute;inset:0;background:rgba(38,59,44,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.mmenu-panel{position:relative;z-index:1;background:var(--crema);background-image:var(--grano);width:100%;max-width:340px;height:100%;box-shadow:-12px 0 40px rgba(58,44,20,.25);padding:0;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);border-left:2px dotted var(--linea-fuerte)}
+.mmenu.open .mmenu-panel{transform:translateX(0)}
+.mmenu-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:2px dotted var(--linea-fuerte);flex-shrink:0}
+.mmenu-close{width:36px;height:36px;border-radius:50%;border:none;background:var(--crema-osc);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--tinta);transition:background .15s}
+.mmenu-close:active{background:var(--linea-fuerte)}
+/* cuerpo con scroll del menú móvil */
+.mmenu-body{flex:1;overflow-y:auto;padding:8px 0 20px}
+.mmenu a,.mmenu button.mm-btn{display:flex;align-items:center;gap:12px;padding:14px 22px;font-size:15px;font-weight:600;color:var(--tinta-fuerte);text-decoration:none;border:none;background:none;width:100%;text-align:left;font-family:inherit;cursor:pointer;transition:background .15s;border-radius:0}
+.mmenu a:active,.mmenu button.mm-btn:active{background:var(--verde-100)}
+/* botón hamburguesa: pequeño efecto al tocarlo */
+#btn-ham{transition:background .15s ease,border-color .15s ease}
+#btn-ham:active{background:var(--verde-100);border-color:var(--verde-300)}
+#btn-ham:focus{outline:none}
+
+/* LOADER: circulito giratorio (hoy no se usa, queda por si se necesita) */
+.ld{width:20px;height:20px;border:2.5px solid rgba(255,251,240,.3);border-top-color:var(--papel);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+
+/* ─── RESEÑAS ─── */
+/* barra verde a la izquierda de cada reseña */
+.rcard{border-left:4px solid var(--verde-500)}
+/* en la sección de comunidad parecen notitas pegadas con cinta adhesiva */
+.reviews-grid .rcard{position:relative;background:var(--papel);border:1px solid var(--linea);border-left:4px solid var(--verde-500);border-radius:6px;padding:20px 18px 16px;box-shadow:0 10px 16px -12px rgba(58,44,20,.45)}
+.reviews-grid .rcard::before{content:'';position:absolute;top:-9px;left:50%;width:58px;height:17px;transform:translateX(-50%) rotate(-2deg);background:rgba(193,154,65,.3);border-left:1px dashed rgba(193,154,65,.55);border-right:1px dashed rgba(193,154,65,.55)}
+
+/* ─── FILTROS ─── */
+/* botones de categoría: borde punteado; .active los pinta de verde sólido */
+.cb{padding:8px 18px;border-radius:999px;border:1.5px dashed var(--linea-fuerte);font-size:13px;font-weight:600;cursor:pointer;background:var(--papel);color:var(--tinta);flex-shrink:0;white-space:nowrap;transition:all .2s}
+.cb:hover{border-color:var(--verde-700)}
+.cb.active{background:var(--verde-700);color:var(--papel);border:1.5px solid var(--verde-700)}
+/* fila de filtros que se desliza a los lados en celular, sin barra visible */
+.fscroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.fscroll::-webkit-scrollbar{display:none}
+
+/* botón 'Ver más lugares' y botones chicos de ubicación del formulario */
+.btn-more{padding:12px 28px;border-radius:10px;border:1.5px dashed var(--verde-700);background:var(--papel);color:var(--verde-900);font-weight:700;font-size:14px;transition:background .2s}
+.btn-more:hover{background:var(--verde-50)}
+.btn-mini{padding:8px 14px;border-radius:999px;border:1.5px dashed var(--verde-300);background:var(--verde-100);color:var(--verde-800);font-weight:600;font-size:12px}
+
+/* ─── SECCIONES ─── */
+/* franja de papel claro con borde punteado (sección de comunidad) */
+.sec-papel{background:var(--papel);border-top:2px dashed var(--linea-fuerte);border-bottom:2px dashed var(--linea-fuerte);padding:52px 16px}
+/* pie de página verde con el borde de papel rasgado arriba y una ruta punteada */
+.pie{position:relative;background:var(--verde-900);color:var(--verde-300);text-align:center;padding:56px 16px calc(36px + env(safe-area-inset-bottom,0))}
+.pie::before{content:'';position:absolute;left:0;right:0;top:-1px;height:30px;background:var(--rasgado) repeat-x bottom/600px 30px;transform:scaleY(-1)}
+.ruta{color:var(--verde-500);letter-spacing:.35em;font-size:12px;margin-bottom:14px}
+
+/* espacio extra abajo para celulares con barra inferior (iPhone) */
+.pb-safe{padding-bottom:env(safe-area-inset-bottom,0)}
+
+/* ─── CUADRÍCULAS ─── */
+/* 1 columna en celular, 2 en tablet y 3 en escritorio (tarjetas y reseñas) */
+.places-grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:540px){.places-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.places-grid{grid-template-columns:repeat(3,1fr)}}
+
+.reviews-grid{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:540px){.reviews-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.reviews-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* dos columnas en los formularios (nombre/apellido, lat/lng) */
+.pg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:400px){.pg2{grid-template-columns:1fr}}
+
+/* botón flotante '+' para agregar lugar; solo se ve en celular */
+.fab{position:fixed;bottom:24px;right:20px;z-index:100;background:var(--verde-700);color:var(--papel);width:54px;height:54px;border-radius:50%;border:none;font-size:24px;cursor:pointer;box-shadow:0 2px 0 var(--verde-900),0 8px 18px rgba(38,59,44,.35);display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s}
+.fab:active{transform:scale(.92);background:var(--verde-800)}
+@media(min-width:640px){.fab{display:none}}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--verde-300);border-radius:3px}
+
+/* ─── Cerca de ti ─── */
+/* Distancia en las tarjetas */
+.pc-km{font-size:11px;font-weight:700;color:var(--verde-700);margin-top:2px}
+/* Chip "Cerca de mí": se distingue de las categorías con borde sólido verde */
+.cb-cerca{border-style:solid;border-color:var(--verde-700);color:var(--verde-800)}
+.fila-radio{display:none;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--tinta-suave)}
+/* Sección con fondo verde suave, entre las tarjetas y la comunidad */
+.sec-cerca{background:var(--verde-50);border-top:2px dashed var(--linea-fuerte);padding:48px 16px}
+.fila-cerca{display:flex;align-items:center;flex-wrap:wrap;gap:10px;color:var(--tinta-suave)}
+.cerca-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:760px){.cerca-grid{grid-template-columns:repeat(2,1fr)}}
+.cerca-grid .sk{height:84px}
+/* Tarjeta compacta de un resultado */
+.cc{display:flex;align-items:center;gap:12px;background:var(--papel);border:1px solid var(--linea);border-radius:14px;padding:12px 14px}
+.cc-info{flex:1;min-width:0}
+.cc-nom{font-weight:700;font-size:14px;color:var(--verde-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-sub{font-size:12px;color:var(--tinta-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-acc{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.cb-cerca.active{color:var(--papel)}
+/* En pantallas grandes los filtros se acomodan en varias filas en vez de deslizarse */
+@media(min-width:900px){#filtros{flex-wrap:wrap;overflow:visible}}
