@@ -1,0 +1,19 @@
+{
+  "name": "exploracr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ExploraCR: lugares de Costa Rica, con mapa y cerca de ti (app Android e iOS con Capacitor)",
+  "scripts": {
+    "web": "node scripts/copiar-web.js",
+    "sync": "npm run web && npx cap sync"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/geolocation": "^7.0.0",
+    "@capacitor/ios": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}

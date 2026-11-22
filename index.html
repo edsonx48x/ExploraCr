@@ -4,6 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>ExploraCR — Descubre Costa Rica</title>
+<!-- App instalable (PWA): manifiesto, color de la barra y ícono para iPhone -->
+<link rel="manifest" href="manifest.webmanifest"/>
+<meta name="theme-color" content="#263b2c"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="ExploraCR"/>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" href="icons/icon-192.png"/>
 <!-- Conexión anticipada a Google Fonts para que la fuente cargue más rápido -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -257,6 +264,8 @@
   <p class="ruta" aria-hidden="true">· · · · · ✦ · · · · ·</p>
   <p class="fd" style="font-size:20px;color:var(--crema);margin-bottom:6px;font-style:italic">Pura Vida 🌿</p>
   <p style="font-size:12px">ExploraCR · Hecho con ❤️ para descubrir Costa Rica</p>
+  <!-- Aparece solo si el navegador permite instalar la app -->
+  <button id="btn-instalar" class="btn btn-claro btn-sm" onclick="instalarApp()" style="display:none;margin-top:14px">📲 Instalar app</button>
 </footer>
 
 <!-- FAB móvil -->
@@ -406,5 +415,13 @@
   </div>
 </div>
 
+<script>
+// App instalable: registra el service worker (funciona sin internet) y muestra el botón "Instalar app"
+let _instalar=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_instalar=e;document.getElementById('btn-instalar').style.display='inline-block';});
+window.addEventListener('appinstalled',()=>{_instalar=null;document.getElementById('btn-instalar').style.display='none';});
+function instalarApp(){if(_instalar){_instalar.prompt();_instalar=null;}}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
 </body>
 </html>
